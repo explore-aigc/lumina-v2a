@@ -1,6 +1,6 @@
 # Nerfies
 
-This is the repository that contains source code for the [Lumina-V2A](https://lumina-v2a.github.io).
+This is the repository that contains source code for the [Lumina-V2A](https://lumina-v2a).
 
 If you find Nerfies useful for your work please cite:
 ```
