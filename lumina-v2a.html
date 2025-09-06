@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Generate high-quality and high-sychronization audio for the video.">
+  <meta name="keywords" content="Video-to-audio generation, audio-video synchronization, DPO">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lumina-V2A: Efficient Video-to-Audio Generation with Diffusion Transformer and Semantic-Temporal Alignment-Ranked Direct Preference Optimization</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <style>
+    /* 横向滚动容器 */
+    .table-scroll{
+      display:block;
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch; /* 移动端惯性滚动 */
+    }
+    /* 关键：让表格按内容展开而不是被限制为 100% */
+    .table-scroll table{
+      width:max-content;
+      min-width:1100px; /* 可按列数/单元内容调整 */
+      border-collapse:separate; /* 防止某些浏览器压缩导致不触发滚动 */
+    }
+    .table-scroll th,
+    .table-scroll td{
+      white-space:nowrap;       /* 不换行，保证横向溢出才出现滚动条 */
+      text-align:center;
+      vertical-align:middle;
+    }
+    /* 可选：限制单元内 <video> 的显示宽度，避免过大 */
+    /* .table-scroll video{
+      max-width:280px;
+      height:auto;
+    } */
+     
+  </style>
+  
+</head>
+
+<body>  
+
+    <section class="hero is-light is-small" style="margin-top: 10px;">
+        <div class="hero-body" style="padding-top: 1rem; padding-bottom: 0.5rem;">
+            
+            <div class="container shadow p-5 mb-5 bg-white rounded">
+              <h2 class="title is-3">More In-Domain Samples in VGGSound</h2>
+              
+              <div class="table-scroll">
+                <table class="table table-hover" id="gender_table_1">
+                  <thead>
+                    <tr>
+                      <th style="text-align: center">Text Caption</th>
+                      <th style="text-align: center">Ground Truth</th>
+                      <th style="text-align: center">Lumina-V2A (ours)</th>
+                      <th style="text-align: center">MMAudio</th>
+                      <th style="text-align: center">SAH</th>
+                      <th style="text-align: center">FoleyCrafer</th>
+                      <th style="text-align: center">Frieren</th>
+                      <th style="text-align: center">VATT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+        
+                    <tr height=100px>
+                      <td style="text-align: center">sea waves</td>
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/GT.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/ours.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/MMAudio.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/sah.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/FoleyCrafter.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/Frieren.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/-r4vbRkcndc_000128/VATT_name-r4vbRkcndc_000128_output.mp4" type="video/mp4">
+                    </tr>
+
+                    <tr height=100px>
+                      <td style="text-align: center">coyote howling</td>
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/GT.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/ours.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/MMAudio.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/sah.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/FoleyCrafter.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/Frieren.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/2S-YRM0p6cc_000034/VATT.mp4" type="video/mp4">
+                    </tr>
+                    <tr height=100px>
+                      <td style="text-align: center">golf driving</td>
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/GT.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/ours.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/MMAudio.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/sah.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/FoleyCrafter.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/Frieren.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/4OCcv5d6xsU_000029/VATT_output.mp4" type="video/mp4">
+                    </tr>
+
+                    <tr height=100px>
+                        <td style="text-align: center">playing bass drum</td>
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/GT.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/ours.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/MMAudio.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/sah.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/FoleyCrafter.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/Frieren.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/5gsfdVBThoI_000203/VATT_output.mp4" type="video/mp4">
+                      </tr>
+
+                    <tr height=100px>
+                      <td style="text-align: center">playing tennis</td>
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/GT.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/ours.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/MMAudio.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/sah.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/FoleyCrafter.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/Frieren.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/_jB-IM_77lI_000000/VATT.mp4" type="video/mp4">
+                    </tr>
+
+                    <tr height=100px>
+                      <td style="text-align: center">playing the drum</td>
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/GT.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/GT.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/ours.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/sah.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/FoleyCrafter.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/Frieren.mp4" type="video/mp4">
+                      <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/pqHot_n_kB8_000150/VATT_output.mp4" type="video/mp4">
+                    </tr>
+
+                    <tr height=100px>
+                        <td style="text-align: center">barking</td>
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/GT.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/ours.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/MMAudio.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/sah.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/FoleyCrafter.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/Frieren.mp4" type="video/mp4">
+                        <td style="text-align: center"><video width="280" controls controlslist="nodownload" class="px-1"><source src="./static/videos/vggsound/gTylPieYBcI_000125/VATT.mp4" type="video/mp4">
+                      </tr>
+                  </tbody>
+                </table>
+                <p>&nbsp</p>
+          
+              </div>
+      
+              
+              <br/>
+              <!--/ Interpolating. -->
+      
+      
+      
+            </div>
+          <!--/ Animation. -->
+      
+        
+      
+        </div>
+      </section>
+</body>
+</html>
